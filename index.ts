@@ -7,7 +7,7 @@ app.use(express.json());
 //RUTAS
 
 //get all productos
-app.get("/productos", async (req, res) => {
+app.get("/api/productos", async (req, res) => {
   try {
     const allProductos = await pool.query("SELECT * FROM producto");
 
@@ -17,7 +17,7 @@ app.get("/productos", async (req, res) => {
   }
 });
 //get producto
-app.get("/productos/:id", async (req, res) => {
+app.get("/api/productos/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const allProductos = await pool.query(
@@ -32,7 +32,7 @@ app.get("/productos/:id", async (req, res) => {
 });
 
 //create producto
-app.post("/productos", async (req, res) => {
+app.post("/api/productos", async (req, res) => {
   try {
     const { nombre, precio, puntos } = req.body;
 
@@ -48,7 +48,7 @@ app.post("/productos", async (req, res) => {
 });
 
 //update producto
-app.put("/productos/:id", async (req, res) => {
+app.put("/api/productos/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { nombre, precio, puntos } = req.body;
@@ -65,7 +65,7 @@ app.put("/productos/:id", async (req, res) => {
 });
 
 //delete producto
-app.delete("/productos/:id", async (req, res) => {
+app.delete("/api/productos/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -80,7 +80,7 @@ app.delete("/productos/:id", async (req, res) => {
 });
 
 //get all usuarios
-app.get("/productos", async (req, res) => {
+app.get("/api/productos", async (req, res) => {
   try {
     const allProductos = await pool.query("SELECT * FROM producto");
 
@@ -91,7 +91,7 @@ app.get("/productos", async (req, res) => {
 });
 
 //get usuario
-app.get("/productos/:id", async (req, res) => {
+app.get("/api/productos/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const allProductos = await pool.query(
@@ -105,7 +105,7 @@ app.get("/productos/:id", async (req, res) => {
   }
 });
 //create usuario
-app.post("/productos", async (req, res) => {
+app.post("/api/productos", async (req, res) => {
   try {
     const { nombre, precio, puntos } = req.body;
 
@@ -120,7 +120,7 @@ app.post("/productos", async (req, res) => {
   }
 });
 //update usuario
-app.put("/productos/:id", async (req, res) => {
+app.put("/api/productos/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { nombre, precio, puntos } = req.body;
@@ -136,7 +136,7 @@ app.put("/productos/:id", async (req, res) => {
   }
 });
 //delete usuario
-app.delete("/productos/:id", async (req, res) => {
+app.delete("/api/productos/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
