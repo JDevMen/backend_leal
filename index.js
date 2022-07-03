@@ -66,6 +66,30 @@ const {
 const {
   getPuntosUsuarioInteractor,
 } = require("./use-cases/usuario_use_cases/getPuntosUsuarioInteractor.js");
+const {
+  getProductosPaginadoInteractor,
+} = require("./use-cases/producto_use_cases/getProductosPaginadoInteractor.js");
+const {
+  getProductosPaginadoPersistence,
+} = require("./data-access/producto/getProductosPaginadoPersistence.js");
+const {
+  getNumeroProductosInteractor,
+} = require("./use-cases/producto_use_cases/getNumeroProductosInteractor.js");
+const {
+  getNumeroProductosPersistence,
+} = require("./data-access/producto/getNumeroProductosInteractor.js");
+const {
+  updateRedimirPuntosUsuarioInteractor,
+} = require("./use-cases/usuario_use_cases/updateRedimirPuntosUsuarioInteractor.js");
+const {
+  updatePuntosUsuarioPersistence,
+} = require("./data-access/usuario/updatePuntosUsuarioPersistence.js");
+const {
+  getPuntosProductoPersistence,
+} = require("./data-access/producto/getPuntosProductoPersistence.js");
+const {
+  updateAcumularPuntosUsuarioInteractor,
+} = require("./use-cases/usuario_use_cases/updateAcumularPuntosUsuarioInteractor.js");
 
 app.use(express.json());
 
@@ -159,6 +183,37 @@ app.delete("/api/productos/:id", async (req, res) => {
     );
 
     res.status(204);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+//CASOS ESPECIALES-------------------------------------//
+//get productos paginado
+app.get("/api/productos-paginado/", async (req, res) => {
+  try {
+    const { pagina, offset } = req.body;
+
+    const productosPaginados = await getProductosPaginadoInteractor(
+      {
+        getProductosPaginadoPersistence,
+      },
+      { pagina, offset }
+    );
+
+    res.status(200).send(productosPaginados);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+//get cantidad de productos
+app.get("/api/productos-cantidad/", async (req, res) => {
+  try {
+    const numeroProductos = await getNumeroProductosInteractor({
+      getNumeroProductosPersistence,
+    });
+
+    res.status(200).send(numeroProductos);
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -260,6 +315,46 @@ app.get("/api/usuarios/:id/puntos", async (req, res) => {
     );
 
     res.status(200).json(puntosUsuario);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+//update redención puntos de usuario
+app.put("/api/usuarios/:id/redimir-puntos", async (req, res) => {
+  const { id } = req.params;
+  const { idProducto, cantidad } = req.body;
+  try {
+    const respuestaUpdate = await updateRedimirPuntosUsuarioInteractor(
+      {
+        getPuntosUsuarioPersistence,
+        getPuntosProductoPersistence,
+        updatePuntosUsuarioPersistence,
+      },
+      { id, idProducto, cantidad }
+    );
+
+    res.status(200).json(respuestaUpdate);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+//update acumulación puntos de usuario
+app.put("/api/usuarios/:id/acumular-puntos", async (req, res) => {
+  const { id } = req.params;
+  const { idProducto, cantidad } = req.body;
+  try {
+    const respuestaUpdate = await updateAcumularPuntosUsuarioInteractor(
+      {
+        getPuntosUsuarioPersistence,
+        getProductoPersistence,
+        updatePuntosUsuarioPersistence,
+      },
+      { id, idProducto, cantidad }
+    );
+
+    res.status(200).json(respuestaUpdate);
   } catch (err) {
     res.status(500).send(err.message);
   }

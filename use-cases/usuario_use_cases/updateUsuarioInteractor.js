@@ -7,7 +7,7 @@ exports.updateUsuarioInteractor = async (
   try {
     const usuarioExiste = await getUsuarioPersistence(id);
 
-    if (!usuarioExiste) throw new Error(`El producto con id ${id} no existe`);
+    if (!usuarioExiste) throw new Error(`El usuario con id ${id} no existe`);
 
     const usuario = new UsuarioEntity({ correo, contrasena, puntos });
 
