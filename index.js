@@ -1,21 +1,35 @@
 const express = require("express");
 const app = express();
-const { deleteProducto } = require("./producto/deleteProducto.js");
-const { getProducto } = require("./producto/getProducto.js");
-const { updateProducto } = require("./producto/updateProducto.js");
 const {
   createProductoInteractor,
 } = require("./use-cases/producto_use_cases/createProductoInteractor.js");
 const {
   createProductoPersistence,
 } = require("./data-access/producto/createProductoPersistence");
-const { json } = require("stream/consumers");
 const {
   getProductosInteractor,
 } = require("./use-cases/producto_use_cases/getProductosInteractor.js");
 const {
   getProductosPersistence,
 } = require("./data-access/producto/getProductosPersistence.js");
+const {
+  getProductoInteractor,
+} = require("./use-cases/producto_use_cases/getProductoInteractor.js");
+const {
+  getProductoPersistence,
+} = require("./data-access/producto/getProductoPersistence.js");
+const {
+  updateProductoInteractor,
+} = require("./use-cases/producto_use_cases/updateProductoInteractor.js");
+const {
+  updateProductoPersistence,
+} = require("./data-access/producto/updateProductoPersistence.js");
+const {
+  deleteProductoInteractor,
+} = require("./use-cases/producto_use_cases/deleteProductoInteractor.js");
+const {
+  deleteProductoPersistence,
+} = require("./data-access/producto/deleteProductoPersistence.js");
 
 app.use(express.json());
 
@@ -35,7 +49,22 @@ app.get("/api/productos", async (req, res) => {
 });
 
 //get producto
-app.get("/api/productos/:id", getProducto);
+app.get("/api/productos/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const producto = await getProductoInteractor(
+      {
+        getProductoPersistence,
+      },
+      { id }
+    );
+
+    res.status(200).json(producto);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
 //create producto
 app.post("/api/productos", async (req, res) => {
@@ -43,7 +72,9 @@ app.post("/api/productos", async (req, res) => {
 
   try {
     const newProducto = await createProductoInteractor(
-      { createProductoPersistence },
+      {
+        createProductoPersistence,
+      },
       {
         nombre,
         precio,
@@ -51,17 +82,48 @@ app.post("/api/productos", async (req, res) => {
       }
     );
 
-    res.json(newProducto);
+    res.status(201).json(newProducto);
   } catch (err) {
     res.status(500).send(err.message);
   }
 });
 
 //update producto
-app.put("/api/productos/:id", updateProducto);
+app.put("/api/productos/:id", async (req, res) => {
+  const { id } = req.params;
+  const { nombre, precio, puntos } = req.body;
+
+  try {
+    const updatedProducto = await updateProductoInteractor(
+      {
+        getProductoPersistence,
+        updateProductoPersistence,
+      },
+      { id, nombre, precio, puntos }
+    );
+    res.status(200).json(updatedProducto);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
 //delete producto
-app.delete("/api/productos/:id", deleteProducto);
+app.delete("/api/productos/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    await deleteProductoInteractor(
+      {
+        getProductoPersistence,
+        deleteProductoPersistence,
+      },
+      { id }
+    );
+
+    res.status(204);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
 //usuarios api
 
