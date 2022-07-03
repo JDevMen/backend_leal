@@ -30,6 +30,24 @@ const {
 const {
   deleteProductoPersistence,
 } = require("./data-access/producto/deleteProductoPersistence.js");
+const {
+  getUsuariosInteractor,
+} = require("./use-cases/usuario_use_cases/getUsuariosInteractor.js");
+const {
+  getUsuariosPersistence,
+} = require("./data-access/usuario/getUsuariosPersistence.js");
+const {
+  getUsuarioInteractor,
+} = require("./use-cases/usuario_use_cases/getUsuarioInteractor.js");
+const {
+  getUsuarioPersistence,
+} = require("./data-access/usuario/getUsuarioPersistence.js");
+const {
+  createUsuarioInteractor,
+} = require("./use-cases/usuario_use_cases/createUsuarioInteractor.js");
+const {
+  createUsuarioPersistence,
+} = require("./data-access/usuario/createUsuarioPersistence.js");
 
 app.use(express.json());
 
@@ -127,46 +145,50 @@ app.delete("/api/productos/:id", async (req, res) => {
 
 //usuarios api
 
-// //get all usuarios
-// app.get("/api/productos", async (req, res) => {
-//   try {
-//     const allProductos = await pool.query("SELECT * FROM producto");
+//get all usuarios
+app.get("/api/usuarios", async (req, res) => {
+  try {
+    const allProductos = await getUsuariosInteractor({
+      getUsuariosPersistence,
+    });
 
-//     await res.json(allProductos.rows);
-//   } catch (err) {
-//     console.error(err);
-//   }
-// });
+    res.status(200).json(allProductos);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
-// //get usuario
-// app.get("/api/usuarios/:id", async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const allProductos = await pool.query(
-//       "SELECT * FROM producto WHERE producto_id = $1",
-//       [id]
-//     );
+//get usuario
+app.get("/api/usuarios/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const usuario = await getUsuarioInteractor(
+      { getUsuarioPersistence },
+      { id }
+    );
 
-//     await res.json(allProductos.rows[0]);
-//   } catch (err) {
-//     console.error(err);
-//   }
-// });
-// //create usuario
-// app.post("/api/usuarios", async (req, res) => {
-//   try {
-//     const { nombre, precio, puntos } = req.body;
+    res.status(200).json(usuario);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
-//     const newProducto = await pool.query(
-//       "INSERT INTO producto (nombre, precio, puntos) VALUES ($1, $2, $3) RETURNING *",
-//       [nombre, precio, puntos]
-//     );
+//create usuario
+app.post("/api/usuarios", async (req, res) => {
+  try {
+    const { correo, contrasena } = req.body;
 
-//     await res.json(newProducto.rows[0]);
-//   } catch (err) {
-//     console.error(err);
-//   }
-// });
+    const newUsuario = await createUsuarioInteractor(
+      { createUsuarioPersistence },
+      { correo, contrasena }
+    );
+
+    res.status(201).json(newUsuario);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 // //update usuario
 // app.put("/api/productos/:id", async (req, res) => {
 //   try {
