@@ -1,23 +1,38 @@
 const express = require("express");
 const app = express();
-const {
-  createProductoPersistence,
-} = require("./producto/createProductoPersistence");
-
-const {
-  createProductoInteractor,
-} = require("./producto/createProductoInteractor.js");
 const { deleteProducto } = require("./producto/deleteProducto.js");
 const { getProducto } = require("./producto/getProducto.js");
-const { getProductos } = require("./producto/getProductos");
 const { updateProducto } = require("./producto/updateProducto.js");
+const {
+  createProductoInteractor,
+} = require("./use-cases/producto_use_cases/createProductoInteractor.js");
+const {
+  createProductoPersistence,
+} = require("./data-access/producto/createProductoPersistence");
+const { json } = require("stream/consumers");
+const {
+  getProductosInteractor,
+} = require("./use-cases/producto_use_cases/getProductosInteractor.js");
+const {
+  getProductosPersistence,
+} = require("./data-access/producto/getProductosPersistence.js");
 
 app.use(express.json());
 
 //RUTAS
 
 //get all productos
-app.get("/api/productos", getProductos);
+app.get("/api/productos", async (req, res) => {
+  try {
+    const productos = await getProductosInteractor({
+      getProductosPersistence,
+    });
+
+    res.status(200).json(productos);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
 //get producto
 app.get("/api/productos/:id", getProducto);
