@@ -48,11 +48,32 @@ const {
 const {
   createUsuarioPersistence,
 } = require("./data-access/usuario/createUsuarioPersistence.js");
+const {
+  updateUsuarioInteractor,
+} = require("./use-cases/usuario_use_cases/updateUsuarioInteractor.js");
+const {
+  updateUsuarioPersistence,
+} = require("./data-access/usuario/updateUsuarioPersistence.js");
+const {
+  deleteUsuarioInteractor,
+} = require("./use-cases/usuario_use_cases/deleteUsuarioInteractor.js");
+const {
+  deleteUsuarioPersistence,
+} = require("./data-access/usuario/deleteUsuarioPersistence.js");
+const {
+  getPuntosUsuarioPersistence,
+} = require("./data-access/usuario/getPuntosUsuarioPersistence.js");
+const {
+  getPuntosUsuarioInteractor,
+} = require("./use-cases/usuario_use_cases/getPuntosUsuarioInteractor.js");
 
 app.use(express.json());
 
-//RUTAS
+//RUTAS API--------------------------------------------//
 
+//PRODUCTOS API----------------------------------------//
+
+//CRUD API---------------------------------------------//
 //get all productos
 app.get("/api/productos", async (req, res) => {
   try {
@@ -143,8 +164,9 @@ app.delete("/api/productos/:id", async (req, res) => {
   }
 });
 
-//usuarios api
+//USUARIOS API ----------------------------------------//
 
+//CRUD API---------------------------------------------//
 //get all usuarios
 app.get("/api/usuarios", async (req, res) => {
   try {
@@ -189,36 +211,60 @@ app.post("/api/usuarios", async (req, res) => {
   }
 });
 
-// //update usuario
-// app.put("/api/productos/:id", async (req, res) => {
-//   try {
-//     const { id } = req.params;
-//     const { nombre, precio, puntos } = req.body;
+//update usuario
+app.put("/api/usuarios/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { correo, contrasena, puntos } = req.body;
 
-//     const modifiedProducto = await pool.query(
-//       "UPDATE producto SET nombre= $1, precio= $2, puntos= $3 WHERE producto_id = $4",
-//       [nombre, precio, puntos, id]
-//     );
+    const respuestaUpdate = await updateUsuarioInteractor(
+      { getUsuarioPersistence, updateUsuarioPersistence },
+      { id, correo, contrasena, puntos }
+    );
 
-//     await res.json("El producto ha sido actualizado");
-//   } catch (err) {
-//     console.error(err);
-//   }
-// });
-// //delete usuario
-// app.delete("/api/productos/:id", async (req, res) => {
-//   try {
-//     const { id } = req.params;
+    res.status(200).json(respuestaUpdate);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 
-//     const deletedTodo = await pool.query(
-//       "DELETE FROM producto WHERE producto_id = $1",
-//       [id]
-//     );
-//     res.json("Producto eliminado");
-//   } catch (err) {
-//     console.error(err);
-//   }
-// });
+//delete usuario
+app.delete("/api/usuarios/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const deleteRespuesta = await deleteUsuarioInteractor(
+      {
+        getUsuarioPersistence,
+        deleteUsuarioPersistence,
+      },
+      { id }
+    );
+
+    res.status(204).json(deleteRespuesta);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+//CASOS ESPECIALES-------------------------------------//
+
+//get puntos de usuario por id
+
+app.get("/api/usuarios/:id/puntos", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const puntosUsuario = await getPuntosUsuarioInteractor(
+      { getPuntosUsuarioPersistence },
+      { id }
+    );
+
+    res.status(200).json(puntosUsuario);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 app.listen(8080, () => {
   console.log("server listening in http://localhost:8080");
 });
