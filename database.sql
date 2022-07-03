@@ -1,15 +1,16 @@
-CREATE DATABASE todo_database;
+CREATE DATABASE leal_db;
 
 --\c into todo_database
 CREATE TABLE producto(
     producto_id SERIAL PRIMARY KEY,
     nombre VARCHAR (255), 
-    precio FLOAT,
-    puntos FLOAT
+    precio FLOAT DEFAULT 0,
+    puntos FLOAT DEFAULT 0
 );
 
 CREATE TABLE usuario(
     usuario_id SERIAL PRIMARY KEY,
-    nombre VARCHAR(255),
-    puntos FLOAT
+    correo VARCHAR(255) NOT NULL,
+    contrasena VARCHAR(255),
+    puntos FLOAT NOT NULL DEFAULT 0
 );

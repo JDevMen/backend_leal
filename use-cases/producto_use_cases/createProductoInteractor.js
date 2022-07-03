@@ -1,4 +1,4 @@
-const { ProductoEntity } = require("./productoEntity");
+const { ProductoEntity } = require("../../producto/productoEntity");
 
 exports.createProductoInteractor = async (
   { createProductoPersistence },
