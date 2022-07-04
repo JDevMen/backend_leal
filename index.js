@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
 const {
   createProductoInteractor,
@@ -90,7 +91,19 @@ const {
 const {
   updateAcumularPuntosUsuarioInteractor,
 } = require("./use-cases/usuario_use_cases/updateAcumularPuntosUsuarioInteractor.js");
-
+const {
+  getIngresarUsuarioInteractor,
+} = require("./use-cases/usuario_use_cases/getIngresarUsuarioInteractor.js");
+const {
+  getIngresarUsuarioPersistence,
+} = require("./data-access/usuario/getIngresarUsuarioPersistence.js");
+const {
+  getUsuarioPorCorreoInteractor,
+} = require("./use-cases/usuario_use_cases/getUsuarioPorCorreoInteractor.js");
+const {
+  getUsuarioPorCorreoPersistence,
+} = require("./data-access/usuario/getUsuarioPorCorreoPersistence.js");
+app.use(cors());
 app.use(express.json());
 
 //RUTAS API--------------------------------------------//
@@ -189,9 +202,9 @@ app.delete("/api/productos/:id", async (req, res) => {
 });
 //CASOS ESPECIALES-------------------------------------//
 //get productos paginado
-app.get("/api/productos-paginado/", async (req, res) => {
+app.get("/api/productos-paginado/:pagina/offset/:offset", async (req, res) => {
   try {
-    const { pagina, offset } = req.body;
+    const { pagina, offset } = req.params;
 
     const productosPaginados = await getProductosPaginadoInteractor(
       {
@@ -207,7 +220,7 @@ app.get("/api/productos-paginado/", async (req, res) => {
 });
 
 //get cantidad de productos
-app.get("/api/productos-cantidad/", async (req, res) => {
+app.get("/api/productos-cantidad", async (req, res) => {
   try {
     const numeroProductos = await getNumeroProductosInteractor({
       getNumeroProductosPersistence,
@@ -256,7 +269,7 @@ app.post("/api/usuarios", async (req, res) => {
     const { correo, contrasena } = req.body;
 
     const newUsuario = await createUsuarioInteractor(
-      { createUsuarioPersistence },
+      { getUsuarioPorCorreoPersistence, createUsuarioPersistence },
       { correo, contrasena }
     );
 
@@ -304,8 +317,24 @@ app.delete("/api/usuarios/:id", async (req, res) => {
 
 //CASOS ESPECIALES-------------------------------------//
 
-//get puntos de usuario por id
+//get Usuario por correo
 
+app.get("/api/usuarios-correo/:correo", async (req, res) => {
+  try {
+    const { correo } = req.params;
+
+    const usuario = await getUsuarioPorCorreoInteractor(
+      { getUsuarioPorCorreoPersistence },
+      { correo }
+    );
+
+    res.status(200).json(usuario);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+//get puntos de usuario por id
 app.get("/api/usuarios/:id/puntos", async (req, res) => {
   try {
     const { id } = req.params;
@@ -328,7 +357,7 @@ app.put("/api/usuarios/:id/redimir-puntos", async (req, res) => {
     const respuestaUpdate = await updateRedimirPuntosUsuarioInteractor(
       {
         getPuntosUsuarioPersistence,
-        getPuntosProductoPersistence,
+        getProductoPersistence,
         updatePuntosUsuarioPersistence,
       },
       { id, idProducto, cantidad }
@@ -344,6 +373,7 @@ app.put("/api/usuarios/:id/redimir-puntos", async (req, res) => {
 app.put("/api/usuarios/:id/acumular-puntos", async (req, res) => {
   const { id } = req.params;
   const { idProducto, cantidad } = req.body;
+
   try {
     const respuestaUpdate = await updateAcumularPuntosUsuarioInteractor(
       {
@@ -355,6 +385,23 @@ app.put("/api/usuarios/:id/acumular-puntos", async (req, res) => {
     );
 
     res.status(200).json(respuestaUpdate);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+//post ingresar usuario
+app.post("/api/usuarios-ingresar", async (req, res) => {
+  const { correo, contrasena } = req.body;
+  try {
+    const idUsuario = await getIngresarUsuarioInteractor(
+      {
+        getIngresarUsuarioPersistence,
+      },
+      { correo, contrasena }
+    );
+
+    res.status(200).send(idUsuario);
   } catch (err) {
     res.status(500).send(err.message);
   }

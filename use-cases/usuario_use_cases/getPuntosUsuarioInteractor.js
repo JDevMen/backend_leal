@@ -5,7 +5,8 @@ exports.getPuntosUsuarioInteractor = async (
   try {
     const puntosUsuario = await getPuntosUsuarioPersistence(id);
 
-    if (!puntosUsuario) throw new Error(`El usuario con id ${id} no existe`);
+    if (!puntosUsuario && puntosUsuario !== 0)
+      throw new Error(`El usuario con id ${id} no existe`);
 
     return { id: id, puntos: puntosUsuario };
   } catch (err) {

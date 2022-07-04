@@ -1,7 +1,7 @@
 exports.updateRedimirPuntosUsuarioInteractor = async (
   {
     getPuntosUsuarioPersistence,
-    getPuntosProductoPersistence,
+    getProductoPersistence,
     updatePuntosUsuarioPersistence,
   },
   { id, idProducto, cantidad }
@@ -13,17 +13,15 @@ exports.updateRedimirPuntosUsuarioInteractor = async (
       );
 
     const puntosActuales = await getPuntosUsuarioPersistence(id);
-    const puntosProductoARedimir = await getPuntosProductoPersistence(
-      idProducto
-    );
+    const productoARedimir = await getProductoPersistence(idProducto);
 
     if (puntosActuales === null)
       throw new Error(`No existe el usuario con id ${id}`);
 
-    if (puntosProductoARedimir === null)
+    if (productoARedimir === null)
       throw new Error(`No existe el producto con id ${idProducto}`);
 
-    const nuevosPuntos = puntosActuales - puntosProductoARedimir * cantidad;
+    const nuevosPuntos = puntosActuales - productoARedimir.puntos * cantidad;
 
     if (nuevosPuntos < 0)
       throw new Error("No cuenta con los puntos suficientes para redimir.");
@@ -33,7 +31,12 @@ exports.updateRedimirPuntosUsuarioInteractor = async (
       nuevosPuntos
     );
 
-    return { respuesta: mensajePuntos, nuevosPuntos: nuevosPuntos };
+    return {
+      respuesta: mensajePuntos,
+      nuevosPuntos: nuevosPuntos,
+      producto: productoARedimir,
+      cantidad: cantidad,
+    };
   } catch (err) {
     throw new Error(err);
   }

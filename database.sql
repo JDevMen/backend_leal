@@ -12,5 +12,5 @@ CREATE TABLE usuario(
     usuario_id SERIAL PRIMARY KEY,
     correo VARCHAR(255) NOT NULL,
     contrasena VARCHAR(255),
-    puntos FLOAT NOT NULL DEFAULT 0
+    puntos FLOAT DEFAULT 0
 );

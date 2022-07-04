@@ -7,7 +7,7 @@ exports.getPuntosUsuarioPersistence = async (id) => {
       [id]
     );
 
-    if (!usuario || !usuario.rows[0]) return null;
+    if (!usuario.rows.length) return null;
 
     return usuario.rows[0].puntos;
   } catch (err) {

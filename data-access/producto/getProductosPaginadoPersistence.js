@@ -11,6 +11,8 @@ exports.getProductosPaginadoPersistence = async (pagina, offset) => {
       [offsetSQL, fetchSQL]
     );
 
+    if (!allProductos.rows.length) return null;
+
     return allProductos.rows;
   } catch (err) {
     throw new Error(err);
